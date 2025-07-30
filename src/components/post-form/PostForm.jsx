@@ -6,24 +6,23 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 function PostForm({ post }) {
-  
-  console.log("PostForm Invoked2",post)
+  console.log("PostForm Invoked2", post);
   const { register, handleSubmit, watch, setValue, control, getValues } =
     useForm({
       defaultValues: {
         title: post?.title || "",
-        slug: post?.slug || "",
+        slug: post?.$id || "",
         content: post?.content || "",
         status: post?.status || "active",
       },
     });
-  
-  console.log("PostForm Invoked 1",post)
+
+  console.log("PostForm Invoked 1", post);
 
   const navigate = useNavigate();
   const userData = useSelector((state) => state.authSlice.userData);
 
-  console.log("PostForm Invoked",post)
+  console.log("PostForm Invoked", post);
 
   const submit = async (data) => {
     console.log("Data submitted in PostForm", data);
@@ -44,8 +43,8 @@ function PostForm({ post }) {
       }
     } else {
       console.log("Creating new post with data:", data);
-      const file =  await appwriteService.uploadFile(data.image[0])
-        
+      const file = await appwriteService.uploadFile(data.image[0]);
+
       if (file) {
         const fileId = file.$id;
         data.featuredImage = fileId;
@@ -85,66 +84,74 @@ function PostForm({ post }) {
     };
   }, [watch, slugTransform, setValue]);
 
-
   return (
-    <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
-      <div className="w-2/3 px-2">
-        <Input
-          label="Title :"
-          placeholder="Title"
-          className="mb-4"
-          {...register("title", { required: true })}
-        />
-        <Input
-          label="Slug :"
-          placeholder="Slug"
-          className="mb-4"
-          {...register("slug", { required: true })}
-          onInput={(e) => {
-            setValue("slug", slugTransform(e.currentTarget.value), {
-              shouldValidate: true,
-            });
-          }}
-        />
-        <RTE
-          label="Content :"
-          name="content"
-          control={control}
-          defaultValue={getValues("content")}
-        />
-      </div>
-      <div className="w-1/3 px-2">
-        <Input
-          label="Featured Image :"
-          type="file"
-          className="mb-4"
-          accept="image/png, image/jpg, image/jpeg, image/gif"
-          {...register("image", { required: !post })}
-        />
-        {post && (
-          <div className="w-full mb-4">
-            <img
-              src={appwriteService.getFilePreview(post.featuredImage)}
-              alt={post.title}
-              className="rounded-lg"
-            />
-          </div>
-        )}
-        <Select
-          options={["active", "inactive"]}
-          label="Status"
-          className="mb-4"
-          {...register("status", { required: true })}
-        />
-        <Button
-          type="submit"
-          bgColor={post ? "bg-green-500" : undefined}
-          className="w-full"
-        >
-          {post ? "Update" : "Submit"}
-        </Button>
-      </div>
-    </form>
+    <div>
+      <form
+        onSubmit={handleSubmit(submit)}
+        className="flex flex-col md:flex-row flex-wrap"
+      >
+        {" "}
+        <div className="w-full md:w-2/3 px-2 mb-6">
+          {" "}
+          <Input
+            label="Title :"
+            placeholder="Title"
+            className="mb-4"
+            {...register("title", { required: true })}
+          />{" "}
+          <Input
+            label="Slug :"
+            placeholder="Slug"
+            className="mb-4"
+            {...register("slug", { required: true })}
+            onInput={(e) => {
+              setValue("slug", slugTransform(e.currentTarget.value), {
+                shouldValidate: true,
+              });
+            }}
+          />{" "}
+          <RTE
+            label="Content :"
+            name="content"
+            control={control}
+            defaultValue={getValues("content")}
+          />{" "}
+        </div>{" "}
+        <div className="w-full md:w-1/3 px-2">
+          {" "}
+          <Input
+            label="Featured Image :"
+            type="file"
+            className="mb-4"
+            accept="image/png, image/jpg, image/jpeg, image/gif"
+            {...register("image", { required: !post })}
+          />{" "}
+          {post && (
+            <div className="w-full mb-4">
+              {" "}
+              <img
+                src={appwriteService.getFilePreview(post.featuredImage)}
+                alt={post.title}
+                className="rounded-lg w-full object-cover"
+              />{" "}
+            </div>
+          )}{" "}
+          <Select
+            options={["active", "inactive"]}
+            label="Status"
+            className="mb-4"
+            {...register("status", { required: true })}
+          />{" "}
+          <Button
+            type="submit"
+            bgColor={post ? "bg-green-500" : undefined}
+            className="w-full"
+          >
+            {post ? "Update" : "Submit"} {" "}
+          </Button>{" "}
+        </div>
+      </form>
+    </div>
   );
 }
 

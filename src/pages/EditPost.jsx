@@ -4,7 +4,7 @@ import { Container, PostForm } from '../components'
 import appwriteService from '../appwrite/appwriteConfig'
 
 function EditPost() {
-    const [post,setPost] = useState
+    const [post,setPost] = useState(null)
     const { slug } =useParams()
     const navigate = useNavigate()
 
